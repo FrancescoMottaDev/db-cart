@@ -5,4 +5,9 @@
 
 export const controllers = {
   Assets: () => import('#controllers/assets_controller'),
+  Collections: () => import('#controllers/collections_controller'),
+  PaymentMethods: () => import('#controllers/payment_methods_controller'),
+  ShippingCategories: () => import('#controllers/shipping_categories_controller'),
+  StockLocations: () => import('#controllers/stock_locations_controller'),
+  TaxCategories: () => import('#controllers/tax_categories_controller'),
 }

@@ -9,6 +9,7 @@
 
 const AssetsController = () => import('#controllers/assets_controller')
 const CollectionsController = () => import('#controllers/collections_controller')
+const PaymentMethodsController = () => import('#controllers/payment_methods_controller')
 const ShippingCategoriesController = () => import('#controllers/shipping_categories_controller')
 const StockLocationsController = () => import('#controllers/stock_locations_controller')
 const TaxCategoriesController = () => import('#controllers/tax_categories_controller')
@@ -33,6 +34,16 @@ router
     router.delete('/:id', [CollectionsController, 'destroy']).as('api.collections.destroy')
   })
   .prefix('/api/collections')
+
+router
+  .group(() => {
+    router.get('/', [PaymentMethodsController, 'index']).as('api.payment-methods.index')
+    router.post('/', [PaymentMethodsController, 'store']).as('api.payment-methods.store')
+    router.get('/:id', [PaymentMethodsController, 'show']).as('api.payment-methods.show')
+    router.put('/:id', [PaymentMethodsController, 'update']).as('api.payment-methods.update')
+    router.delete('/:id', [PaymentMethodsController, 'destroy']).as('api.payment-methods.destroy')
+  })
+  .prefix('/api/payment-methods')
 
 router
   .group(() => {
