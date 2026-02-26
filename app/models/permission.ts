@@ -1,20 +1,16 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
-import type { ManyToMany } from '@adonisjs/lucid/types/relations'
-import Role from './role.js'
+import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
+import Role from '#models/role'
+import RolePermissions from '#models/role_permissions'
 
 export default class Permission extends BaseModel {
+  public static table = 'permission'
+
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare name: string
-
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare name: string | null
 
   /*************  RELATIONS  *************/
 
@@ -22,8 +18,11 @@ export default class Permission extends BaseModel {
     pivotTable: 'role_permissions',
     pivotForeignKey: 'permission_id',
     pivotRelatedForeignKey: 'role_id',
-    localKey: 'id',
-    relatedKey: 'id',
   })
   declare roles: ManyToMany<typeof Role>
+
+  @hasMany(() => RolePermissions, {
+    foreignKey: 'permissionId',
+  })
+  declare rolePermissions: HasMany<typeof RolePermissions>
 }

@@ -1,20 +1,20 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import ProductVariant from '#models/product_variant'
 
 export default class TaxCategory extends BaseModel {
-  static table = 'tax_category'
+  public static table = 'tax_category'
 
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare name: string
-
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare name: string | null
 
   /*************  RELATIONS  *************/
+
+  @hasMany(() => ProductVariant, {
+    foreignKey: 'taxCategoryId',
+  })
+  declare productVariants: HasMany<typeof ProductVariant>
 }

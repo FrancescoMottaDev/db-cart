@@ -1,57 +1,70 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import Customer from './customer.js'
-import Region from './region.js'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Customer from '#models/customer'
+import Order from '#models/order'
+import Region from '#models/region'
 
 export default class CustomerAddress extends BaseModel {
+  public static table = 'customer_address'
+
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare customerId: number
+  declare customerId: number | null
 
   @column()
-  declare isDefaultShipping: boolean
+  declare isDefaultShipping: boolean | null
 
   @column()
-  declare isDefaultBilling: boolean
+  declare isDefaultBilling: boolean | null
 
   @column()
-  declare fullName: string
+  declare fullName: string | null
 
   @column()
-  declare company?: string
+  declare company: string | null
+
+  @column({ columnName: 'street_line_1' })
+  declare streetLine1: string | null
+
+  @column({ columnName: 'street_line_2' })
+  declare streetLine2: string | null
 
   @column()
-  declare streetLine1: string
+  declare city: string | null
 
   @column()
-  declare streetLine2?: string
+  declare province: string | null
 
   @column()
-  declare city: string
+  declare zipCode: string | null
 
   @column()
-  declare province?: string
+  declare phoneNumber: string | null
 
   @column()
-  declare zipCode: string
-
-  @column()
-  declare phoneNumber?: string
-
-  @column()
-  declare countryId: number
+  declare countryId: number | null
 
   /*************  RELATIONS  *************/
 
+  @belongsTo(() => Region, {
+    foreignKey: 'countryId',
+  })
+  declare country: BelongsTo<typeof Region>
+
   @belongsTo(() => Customer, {
-    foreignKey: 'customer_id',
+    foreignKey: 'customerId',
   })
   declare customer: BelongsTo<typeof Customer>
 
-  @belongsTo(() => Region, {
-    foreignKey: 'country_id',
+  @hasMany(() => Order, {
+    foreignKey: 'billingAddressId',
   })
-  declare country: BelongsTo<typeof Region>
+  declare billingAddressOrders: HasMany<typeof Order>
+
+  @hasMany(() => Order, {
+    foreignKey: 'shippingAddressId',
+  })
+  declare shippingAddressOrders: HasMany<typeof Order>
 }

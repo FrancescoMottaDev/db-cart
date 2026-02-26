@@ -1,15 +1,26 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import Order from '#models/order'
+import Payment from '#models/payment'
 
 export default class PaymentMethod extends BaseModel {
+  public static table = 'payment_method'
+
   @column({ isPrimary: true })
   declare id: number
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  @column()
+  declare name: string | null
 
   /*************  RELATIONS  *************/
+
+  @hasMany(() => Order, {
+    foreignKey: 'paymentMethodId',
+  })
+  declare orders: HasMany<typeof Order>
+
+  @hasMany(() => Payment, {
+    foreignKey: 'paymentMethodId',
+  })
+  declare payments: HasMany<typeof Payment>
 }

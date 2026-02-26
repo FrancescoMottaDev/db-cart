@@ -6,8 +6,6 @@ export default class TaxCategoryTransformer {
     return {
       id: taxCategory.id,
       name: taxCategory.name,
-      createdAt: taxCategory.createdAt?.toISO() ?? null,
-      updatedAt: taxCategory.updatedAt?.toISO() ?? null,
     }
   }
 

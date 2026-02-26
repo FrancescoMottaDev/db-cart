@@ -1,15 +1,20 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import AttributeValue from '#models/attribute_value'
 
 export default class Attribute extends BaseModel {
+  public static table = 'attribute'
+
   @column({ isPrimary: true })
   declare id: number
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  @column()
+  declare name: string | null
 
   /*************  RELATIONS  *************/
+
+  @hasMany(() => AttributeValue, {
+    foreignKey: 'attributeId',
+  })
+  declare attributeValues: HasMany<typeof AttributeValue>
 }

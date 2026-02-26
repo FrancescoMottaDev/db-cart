@@ -1,33 +1,50 @@
-import { DateTime } from 'luxon'
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import User from './user.js'
-import CustomerGroup from './customer_group.js'
-import CustomerAddress from './customer_address.js'
+import CustomerAddress from '#models/customer_address'
+import CustomerGroup from '#models/customer_group'
+import Order from '#models/order'
+import User from '#models/user'
+import WishList from '#models/wish_list'
 
 export default class Customer extends BaseModel {
+  public static table = 'customer'
+
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare email: string
+  declare email: string | null
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  @column()
+  declare userId: number | null
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  @column()
+  declare customerGroupId: number | null
 
   /*************  RELATIONS  *************/
 
-  @belongsTo(() => User)
-  declare user: BelongsTo<typeof User>
-
-  @belongsTo(() => CustomerGroup)
+  @belongsTo(() => CustomerGroup, {
+    foreignKey: 'customerGroupId',
+  })
   declare customerGroup: BelongsTo<typeof CustomerGroup>
 
-  @hasMany(() => CustomerAddress, {
-    foreignKey: 'customer_id',
+  @belongsTo(() => User, {
+    foreignKey: 'userId',
   })
-  declare addresses: HasMany<typeof CustomerAddress>
+  declare user: BelongsTo<typeof User>
+
+  @hasMany(() => CustomerAddress, {
+    foreignKey: 'customerId',
+  })
+  declare customerAddresses: HasMany<typeof CustomerAddress>
+
+  @hasMany(() => Order, {
+    foreignKey: 'customerId',
+  })
+  declare orders: HasMany<typeof Order>
+
+  @hasMany(() => WishList, {
+    foreignKey: 'customerId',
+  })
+  declare wishLists: HasMany<typeof WishList>
 }

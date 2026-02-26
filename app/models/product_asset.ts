@@ -1,23 +1,26 @@
 import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import AttributeValue from '#models/attribute_value'
+import Asset from '#models/asset'
 import Product from '#models/product'
 
-export default class ProductAttribute extends BaseModel {
-  public static table = 'product_attributes'
+export default class ProductAsset extends BaseModel {
+  public static table = 'product_assets'
 
   @column({ isPrimary: true })
   declare productId: number
 
   @column({ isPrimary: true })
-  declare attributeValueId: number
+  declare assetId: number
+
+  @column()
+  declare order: number | null
 
   /*************  RELATIONS  *************/
 
-  @belongsTo(() => AttributeValue, {
-    foreignKey: 'attributeValueId',
+  @belongsTo(() => Asset, {
+    foreignKey: 'assetId',
   })
-  declare attributeValue: BelongsTo<typeof AttributeValue>
+  declare asset: BelongsTo<typeof Asset>
 
   @belongsTo(() => Product, {
     foreignKey: 'productId',

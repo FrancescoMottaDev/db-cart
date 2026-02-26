@@ -8,8 +8,6 @@ export default class AssetTransformer {
       name: asset.name,
       width: asset.width,
       height: asset.height,
-      createdAt: asset.createdAt?.toISO() ?? null,
-      updatedAt: asset.updatedAt?.toISO() ?? null,
     }
   }
 

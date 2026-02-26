@@ -1,28 +1,37 @@
-import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
-import ProductOption from './product_option.js'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
+import ProductOption from '#models/product_option'
+import ProductVariant from '#models/product_variant'
+import ProductVariantOption from '#models/product_variant_option'
 
 export default class ProductOptionValue extends BaseModel {
+  public static table = 'product_option_value'
+
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare value: string
+  declare value: string | null
 
   @column()
-  declare optionId: number
-
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare optionId: number | null
 
   /*************  RELATIONS  *************/
 
   @belongsTo(() => ProductOption, {
-    foreignKey: 'product_id',
+    foreignKey: 'optionId',
   })
-  declare product: BelongsTo<typeof ProductOption>
+  declare productOption: BelongsTo<typeof ProductOption>
+
+  @manyToMany(() => ProductVariant, {
+    pivotTable: 'product_variant_options',
+    pivotForeignKey: 'product_options_id',
+    pivotRelatedForeignKey: 'product_variant_id',
+  })
+  declare productVariants: ManyToMany<typeof ProductVariant>
+
+  @hasMany(() => ProductVariantOption, {
+    foreignKey: 'productOptionsId',
+  })
+  declare productVariantOptions: HasMany<typeof ProductVariantOption>
 }

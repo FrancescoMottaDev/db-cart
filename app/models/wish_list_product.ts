@@ -1,15 +1,20 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import WishList from '#models/wish_list'
 
 export default class WishListProduct extends BaseModel {
-  @column({ isPrimary: true })
-  declare id: number
+  public static table = 'wish_list_products'
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  @column()
+  declare wishListId: number | null
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  @column()
+  declare productVariantId: number | null
 
   /*************  RELATIONS  *************/
+
+  @belongsTo(() => WishList, {
+    foreignKey: 'wishListId',
+  })
+  declare wishList: BelongsTo<typeof WishList>
 }

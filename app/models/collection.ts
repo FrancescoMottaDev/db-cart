@@ -1,25 +1,21 @@
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import { DateTime } from 'luxon'
+import Product from '#models/product'
 
 export default class Collection extends BaseModel {
+  public static table = 'collection'
+
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare code: string
+  declare code: string | null
 
   @column()
-  declare name: string
+  declare name: string | null
 
   @column()
   declare parentCollectionId: number | null
-
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
 
   /*************  RELATIONS  *************/
 
@@ -31,5 +27,10 @@ export default class Collection extends BaseModel {
   @hasMany(() => Collection, {
     foreignKey: 'parentCollectionId',
   })
-  declare childrenCollections: HasMany<typeof Collection>
+  declare collections: HasMany<typeof Collection>
+
+  @hasMany(() => Product, {
+    foreignKey: 'collectionId',
+  })
+  declare products: HasMany<typeof Product>
 }
