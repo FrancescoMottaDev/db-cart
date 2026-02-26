@@ -1,61 +1,79 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Asset from '#models/asset'
-import { createAssetValidator, updateAssetValidator } from '#validators/asset_validator'
+import AssetService from '#services/asset_service'
+import AssetTransformer from '#transformers/asset_transformer'
+import { assetIdParamValidator } from '#validators/asset/asset_id_param_validator'
+import { createAssetValidator } from '#validators/asset/create_asset_validator'
+import { listAssetsValidator } from '#validators/asset/list_assets_validator'
+import { updateAssetValidator } from '#validators/asset/update_asset_validator'
+
+const assetService = new AssetService()
 
 export default class AssetsController {
   /**
    * GET /api/assets
    * Query support: ?page=1&perPage=20&q=logo
    */
-  async index({ request }: HttpContext) {
-    const page = request.input('page', 1)
-    const perPage = request.input('perPage', 20)
-    const q = request.input('q')
+  async index({ request, logger }: HttpContext) {
+    const filters = await listAssetsValidator.validate(request.qs())
+    const assets = await assetService.list(filters)
 
-    const query = Asset.query().orderBy('id', 'desc')
+    logger.debug(
+      {
+        page: filters.page ?? 1,
+        perPage: filters.perPage ?? 20,
+        q: filters.q,
+        total: assets.total,
+      },
+      'assets.index'
+    )
 
-    if (q) {
-      query.whereILike('name', `%${q}%`)
-    }
-
-    return query.paginate(page, perPage)
+    return AssetTransformer.paginated(assets)
   }
 
   /**
    * POST /api/assets
    */
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, logger }: HttpContext) {
     const payload = await request.validateUsing(createAssetValidator)
-    const asset = await Asset.create(payload)
-    return response.created(asset)
+    const asset = await assetService.create(payload)
+
+    logger.info({ assetId: asset.id }, 'assets.store')
+
+    return response.created(AssetTransformer.item(asset))
   }
 
   /**
    * GET /api/assets/:id
    */
   async show({ params }: HttpContext) {
-    return Asset.findOrFail(params.id)
+    const { id } = await assetIdParamValidator.validate(params)
+    const asset = await assetService.findByIdOrFail(id)
+
+    return AssetTransformer.item(asset)
   }
 
   /**
    * PUT /api/assets/:id
    */
-  async update({ params, request }: HttpContext) {
-    const asset = await Asset.findOrFail(params.id)
+  async update({ params, request, logger }: HttpContext) {
+    const { id } = await assetIdParamValidator.validate(params)
     const payload = await request.validateUsing(updateAssetValidator)
+    const asset = await assetService.update(id, payload)
 
-    asset.merge(payload)
-    await asset.save()
+    logger.info({ assetId: asset.id, changedFields: Object.keys(payload) }, 'assets.update')
 
-    return asset
+    return AssetTransformer.item(asset)
   }
 
   /**
    * DELETE /api/assets/:id
    */
-  async destroy({ params, response }: HttpContext) {
-    const asset = await Asset.findOrFail(params.id)
-    await asset.delete()
+  async destroy({ params, response, logger }: HttpContext) {
+    const { id } = await assetIdParamValidator.validate(params)
+    await assetService.delete(id)
+
+    logger.info({ assetId: id }, 'assets.destroy')
+
     return response.noContent()
   }
 }
