@@ -9,6 +9,7 @@
 
 const AssetsController = () => import('#controllers/assets_controller')
 const CollectionsController = () => import('#controllers/collections_controller')
+const ShippingCategoriesController = () => import('#controllers/shipping_categories_controller')
 const StockLocationsController = () => import('#controllers/stock_locations_controller')
 const TaxCategoriesController = () => import('#controllers/tax_categories_controller')
 import router from '@adonisjs/core/services/router'
@@ -42,6 +43,20 @@ router
     router.delete('/:id', [TaxCategoriesController, 'destroy']).as('api.tax-categories.destroy')
   })
   .prefix('/api/tax-categories')
+
+router
+  .group(() => {
+    router.get('/', [ShippingCategoriesController, 'index']).as('api.shipping-categories.index')
+    router.post('/', [ShippingCategoriesController, 'store']).as('api.shipping-categories.store')
+    router.get('/:id', [ShippingCategoriesController, 'show']).as('api.shipping-categories.show')
+    router
+      .put('/:id', [ShippingCategoriesController, 'update'])
+      .as('api.shipping-categories.update')
+    router
+      .delete('/:id', [ShippingCategoriesController, 'destroy'])
+      .as('api.shipping-categories.destroy')
+  })
+  .prefix('/api/shipping-categories')
 
 router
   .group(() => {
